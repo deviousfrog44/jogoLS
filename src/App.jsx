@@ -1,8 +1,13 @@
 import "./assets/styles/App.css";
-
+import React, { useState } from "react";
+import Header from "./components/";
+ 
 function App() {
   return (
-    <h1>YOO</h1>
+    <div id="container">
+      <Header />
+      <main></main>
+    </div>
   );
 }
 
