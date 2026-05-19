@@ -1,12 +1,14 @@
 import "./assets/styles/App.css";
 import React, { useState } from "react";
-import Header from "./components/";
+import { Header, GameField } from "./components/";
  
 function App() {
   return (
     <div id="container">
       <Header />
-      <main></main>
+      <main>
+        <GameField />
+      </main>
     </div>
   );
 }
