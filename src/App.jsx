@@ -7,7 +7,6 @@ function App() {
     <div id="container">
       <Header />
       <main>
-        <GameField />
       </main>
     </div>
   );
