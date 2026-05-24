@@ -1,11 +1,11 @@
 import React from "react";
 
-const criarTabuleiroVazio = () => {
+const criarTabuleiro = () => {
   return Array(10).fill(null).map(() => Array(10).fill(0));
 };
 
 function GameField() {
-  const tabuleiroJogador = criarTabuleiroVazio();
+  const tabuleiroJogador = criarTabuleiro();
   const letras = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
   const numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
