@@ -1,12 +1,17 @@
 import "./assets/styles/App.css";
 import React, { useState } from "react";
 import { Header, JogoField} from "./components/"; 
-import Tabuleiro from "./components/setup_tabuleiro/tabuleiro";
+import Tabuleiro from "./components/setup_tabuleiro/tabuleiro.component";
+import Dashboard from "./components/dashboard/dashboard.component";
 
 function App() {
   const [nome_Jogador, setPlayerName] = useState("");
   const [faseJogo, setFaseJogo] = useState("inicio");
   const [tabuleiroJogador, setTabuleiroJogador] = useState(null);
+
+  const [combustivel, setCombustivel] = useState(100);
+  const [tempo, setTempo] = useState("00:00");
+  const [informacao, setInformacao] = useState("Aguardando uma ação do utilizador");
 
   const iniciarJogo = (nome) => {
     if (nome.trim() !== "") {
@@ -38,7 +43,7 @@ function App() {
         borderRadius: "15px", 
         boxShadow: "0 10px 30px rgba(0,0,0,0.5)", 
         width: "90%", 
-        maxWidth: "700px", 
+        maxWidth: "1000px", 
         textAlign: "center" 
       }}>
         
@@ -88,9 +93,33 @@ function App() {
           )}
 
           {faseJogo === "batalha" && (
-            <div style={{ textAlign: "center" }}>
-              <h2>Ecrã de Batalha (Em construção...)</h2>
-              <p>O teu mapa foi guardado com sucesso, {nome_Jogador}!</p>
+            <div>
+              <Dashboard 
+                combustivel={combustivel} 
+                tempo={tempo} 
+                informacao={informacao} 
+              />
+
+              <div style={{ 
+                display: "flex", 
+                justifyContent: "space-around", 
+                gap: "20px", 
+                marginTop: "20px",
+                flexWrap: "wrap"
+              }}>
+                <div>
+                  <h4 style={{ 
+                    margin: "0 0 10px 0", 
+                    color: "#475569" }}>A Tua Frota</h4>
+                  <JogoField />
+                </div>
+                <div>
+                  <h4 style={{ 
+                    margin: "0 0 10px 0", 
+                    color: "#ef4444" }}>Frota do Bot</h4>
+                  <JogoField />
+                </div>
+              </div>
             </div>
           )}
 

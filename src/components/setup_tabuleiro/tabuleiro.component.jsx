@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Celula from "./celula";
+import Celula from "./celula.component";
 
 const criarTabuleiroVazio = () => {
     return Array(10).fill(null).map(() => Array(10).fill(null));
@@ -15,7 +15,7 @@ const frota_inicio = [
   { id: 6, nome: "Navio 6", size: 2 }
 ];
 
-function Tabuleiro() {
+function Tabuleiro({ onTerminarSetup }) {
     const [tabuleiro, setTabuleiro] = useState(criarTabuleiroVazio());
     const [barcosacolocar, setbarcosaacolocar] = useState(frota_inicio);
     const [orientacao, setOrientacao] = useState("H");
@@ -79,7 +79,7 @@ return (
         ) : (
         <div>
           <p>Todos os navios foram colocados!!</p>
-        <button style={{ padding: "10px", background: "#4CAF50", color: "white", borderRadius: "5px", border: "none", cursor: "pointer" }}>
+        <button style={{ padding: "10px", background: "#4CAF50", color: "white", borderRadius: "5px", border: "none", cursor: "pointer" }} onClick={() => onTerminarSetup(tabuleiro)}>
             Começar Jogo
             </button>
         </div>
