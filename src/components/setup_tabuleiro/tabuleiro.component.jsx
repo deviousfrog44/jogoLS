@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Celula from "./celula.component";
+import Quadrado from "./quadrado.component";
 
 const criarTabuleiroVazio = () => {
     return Array(10).fill(null).map(() => Array(10).fill(null));
@@ -22,7 +22,7 @@ function Tabuleiro({ onTerminarSetup }) {
     const letras = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
     const numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-    const clickCelula = (linha, coluna) => {
+    const click = (linha, coluna) => {
         if (barcosacolocar.length === 0) return;
 
     const barcoatual = barcosacolocar[0];
@@ -94,10 +94,10 @@ return (
             <div style={{ textAlign: "center", fontWeight: "bold" }}>{letras[i]}</div>
 
             {linha.map((celula, coluna) => (
-                <Celula
-                    key={`celula-${i}-${coluna}`}
+                <Quadrado
+                    key={`quadrado-${i}-${coluna}`}
                     valor={celula}
-                    onClick={() => clickCelula(i, coluna)}
+                    onClick={() => click(i, coluna)}
                     barcospendentes={barcosacolocar.length}
                     />
             ))}

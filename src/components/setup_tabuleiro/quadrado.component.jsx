@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Celula({ valor, onClick, barcospendentes }) {
+function Quadrado({ valor, onClick, barcospendentes }) {
     return (
         <div
             onClick={onClick}
@@ -15,4 +15,4 @@ function Celula({ valor, onClick, barcospendentes }) {
     );
 }
 
-export default Celula;
+export default Quadrado;
