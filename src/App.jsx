@@ -1,11 +1,12 @@
 import "./assets/styles/App.css";
 import React, { useState } from "react";
 import Header from "./components/header/header.component";
-import JogoField from "./components/jogo_field/jogofield.component";
+import JogoField from "./components/jogofield/jogofield.component";
 import Footer from "./components/footer/footer.component";
 import Tabuleiro from "./components/setup_tabuleiro/tabuleiro.component";
 import Dashboard from "./components/dashboard/dashboard.component";
-import PlayerPanel from "./components/player_panel/playerpanel.component"; 
+import PainelJogador from "./components/painel_jogador/painel_jogador.component";
+
 
 function App() {
   const [nome_Jogador, setPlayerName] = useState("");
@@ -37,7 +38,7 @@ function App() {
         <main style={{ marginTop: "20px" }}>
           
           {faseJogo === "inicio" && (
-            <PlayerPanel 
+            <PainelJogador 
                nome={nome_Jogador} 
                setNome={setPlayerName} 
                onIniciar={iniciarJogo} 
