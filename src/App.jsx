@@ -1,6 +1,7 @@
 import "./assets/styles/App.css";
 import React, { useState } from "react";
 import { Header, JogoField} from "./components/"; 
+import Footer from "./components/footer/footer.component";
 import Tabuleiro from "./components/setup_tabuleiro/tabuleiro.component";
 import Dashboard from "./components/dashboard/dashboard.component";
 
@@ -126,9 +127,7 @@ function App() {
         </main>
       </div>
 
-      <footer style={{ marginTop: "20px", color: "#888", letterSpacing: "2px", fontSize: "14px", fontWeight: "bold" }}>
-        DEIS @ ISEC
-      </footer>
+      <Footer />
 
     </div>
   );
