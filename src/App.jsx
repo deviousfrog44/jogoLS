@@ -1,11 +1,6 @@
 import "./assets/styles/App.css";
 import React, { useState } from "react";
-import Header from "./components/header/header.component";
-import JogoField from "./components/jogofield/jogofield.component";
-import Footer from "./components/footer/footer.component";
-import Tabuleiro from "./components/setup_tabuleiro/tabuleiro.component";
-import Dashboard from "./components/dashboard/dashboard.component";
-import PainelJogador from "./components/painel_jogador/painel_jogador.component";
+import {Header, JogoField, Footer, Tabuleiro, Dashboard, PainelJogador} from "./components/"
 
 
 function App() {
