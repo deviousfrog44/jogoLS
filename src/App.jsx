@@ -40,7 +40,7 @@ function App() {
   }
 
   const VerficaFinal = () => {
-    if (acertosjog === 1) {
+    if (acertosjog === 19) {
       setFaseJogo("fimjog");
       setAcertosBot(0);
       setAcertosJog(0);
