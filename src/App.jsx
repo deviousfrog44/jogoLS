@@ -1,5 +1,5 @@
 import "./assets/styles/App.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {Header, JogoField, Footer, Tabuleiro, Dashboard, PainelJogador} from "./components/"
 
 
@@ -8,8 +8,10 @@ function App() {
   const [faseJogo, setFaseJogo] = useState("inicio");
   const [tabuleiroJogador, setTabuleiroJogador] = useState(null);
 
+  const [estrategiaBot, setEstrategiaBot] = useState("aleatoria");
+  const [Debug, setDebug] = useState(false);
   const [combustivel, setCombustivel] = useState(100);
-  const [tempo, setTempo] = useState("00:15");
+  const [tempo, setTempo] = useState("15");
   const [informacao, setInformacao] = useState("Aguardando uma ação do utilizador");
 
   const iniciarJogo = (nome) => {
@@ -25,6 +27,23 @@ function App() {
     setFaseJogo("batalha");
   };
 
+  useEffect(() => {
+    if (faseJogo === "batalha") {
+
+      if (tempo > 0) {
+        const temporizador = setInterval(() => {
+          setTempo((prev) => prev - 1);
+        }, 1000);
+
+        return () => clearInterval(temporizador);
+      } else if (tempo === 0) {
+        setComubustivel((combustivelAntes) => Math.max(0, combustivelAntes - 5));
+        setInformacao("O tempo acabou, perdeste 5 pontos de combustível!");
+        setTempo(15);
+      }
+    }
+  }, [faseJogo, tempo]);
+
   return (
     <div className="app-container">
       <div className="game-card">
@@ -36,6 +55,10 @@ function App() {
             <PainelJogador 
                nome={nome_Jogador} 
                setNome={setPlayerName} 
+               estrategiaBot={estrategiaBot}
+                setEstrategiaBot={setEstrategiaBot}
+                Debug={Debug}
+                setDebug={setDebug}
                onIniciar={iniciarJogo} 
             />
           )}
@@ -49,7 +72,10 @@ function App() {
 
           {faseJogo === "batalha" && (
             <div>
-              <Dashboard combustivel={combustivel} tempo={tempo} informacao={informacao} />
+              <Dashboard 
+              combustivel={combustivel} 
+              tempo={`00:${tempo < 10 ? `0${tempo}` : tempo}`} 
+              informacao={informacao} />
 
               <div className="batalha-container">
                 <div>
