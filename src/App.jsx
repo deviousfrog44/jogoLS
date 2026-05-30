@@ -54,6 +54,14 @@ function App() {
       setTabuleiroBot(null);
       setTabuleiroJogador(null);
     }
+    if (combustivel === 80) {
+      setFaseJogo("fimbot");
+      setCombustivel(100);
+      setAcertosBot(0);
+      setAcertosJog(0);
+      setTabuleiroBot(null);
+      setTabuleiroJogador(null);
+    }
   };
 
   const finalizarSetup = (mapaPronto) => {
@@ -187,7 +195,7 @@ function App() {
 
           {faseJogo === "fimjog" && (
             <div>
-              <h1>Fim do Jogo! Ganhaste! Parabens Capitão pela vitória.</h1>
+              <h1>Fim do Jogo! Ganhaste! Parabens pela vitória, Capitão.</h1>
               <button onClick={IniciardoFim} className="btn-iniciar">Jogar Novamente</button>
             </div>
           )}
