@@ -1,7 +1,7 @@
 import "./assets/styles/App.css";
 import React, { useState, useEffect } from "react";
 import { Header, JogoField, Footer, Tabuleiro, Dashboard, PainelJogador } from "./components/";
-import { colocarNaviosAleatorio } from "./components/logicabot";
+import { colocarNaviosAleatorio, obterFrotaFixa } from "./components/logicabot";
 
 function App() {
   const [nome_Jogador, setPlayerName] = useState("");
@@ -46,27 +46,35 @@ function App() {
     setAcertosBotTot(0);
     setAcertosJogTot(0);
     setCombustivelGasto(0);
-  }
-
-  const VerficaFinal = () => {
-    if (acertosjog === 19 || acertosbot === 19 || combustivel === 0) {
-        if (acertosjog===19) {setFaseJogo("fimjog");}
-        if (acertosbot===19||combustivel===0){setFaseJogo("fimbot");}
-      setAcertosBotTot(acertosbot);
-      setAcertosJogTot(acertosjog);
-      setCombustivel(100);
-      setAcertosBot(0);
-      setAcertosJog(0);
-      setTabuleiroBot(null);
-      setTabuleiroJogador(null);
-    }
-
+    setCombustivel(100);
+    setTempo(15);
   };
+
+  useEffect(() => {
+    if (faseJogo === "batalha") {
+      if (acertosjog === 19 || acertosbot === 19 || combustivel === 0) {
+        setAcertosBotTot(acertosbot);
+        setAcertosJogTot(acertosjog);
+        
+        if (acertosjog === 19) {
+          setFaseJogo("fimjog"); 
+        } else {
+          setFaseJogo("fimbot"); 
+        }
+      }
+    }
+  }, [acertosjog, acertosbot, combustivel, faseJogo]);
 
   const finalizarSetup = (mapaPronto) => {
     const mapa = mapaPronto || Array(10).fill(null).map(() => Array(10).fill(0));
     setTabuleiroJogador(mapa);
-    setTabuleiroBot(colocarNaviosAleatorio());
+
+    if (estrategiaBot === "aleatoria") {
+      setTabuleiroBot(colocarNaviosAleatorio());
+    } else {
+      setTabuleiroBot(obterFrotaFixa(estrategiaBot));
+    }
+
     setFaseJogo("batalha");
   };
 
@@ -89,50 +97,117 @@ function App() {
   const handleTiroJogador = (linha, coluna) => {
     if (vezDeQuem !== "jogador") return;
     if (tirosTabuleiroBotVisible[linha][coluna] !== null) return;
-    const acertou = tabuleiroBot[linha][coluna] !== null && tabuleiroBot[linha][coluna] !== 0;
-
+    const idBarco = tabuleiroBot[linha][coluna];
+    const acertou = idBarco !== null && idBarco !== 0;
+    
     const novosMarcadores = tirosTabuleiroBotVisible.map(l => [...l]);
     novosMarcadores[linha][coluna] = acertou ? "hit" : "miss";
-    setTirosTabuleiroBotVisible(novosMarcadores);
+    
     if (acertou) {
-        setInformacao("Acertaste em cheio! Ganhaste +5 Combustível. Vez do Bot.");
+        let afundou = true;
+        for (let r = 0; r < 10; r++) {
+            for (let c = 0; c < 10; c++) {
+                if (tabuleiroBot[r][c] === idBarco && novosMarcadores[r][c] !== "hit") {
+                    afundou = false; 
+                }
+            }
+        }
+
+        if (afundou) {
+            for (let r = 0; r < 10; r++) {
+                for (let c = 0; c < 10; c++) {
+                    if (tabuleiroBot[r][c] === idBarco) {
+                        novosMarcadores[r][c] = "sunk";
+                    }
+                }
+            }
+            setInformacao("Afundaste um navio inimigo! Ganhaste +5 de Combustível.");
+        } else {
+            setInformacao("Acertaste num navio! Ganhaste +5 de Combustível.");
+        }
         setCombustivel(c => Math.min(100, c + 5)); 
-        setAcertosJog(acertosjog+1);
+        setAcertosJog(prev => prev + 1);
     } else {
-        setInformacao("Tiro na água! Perdeste -5 Combustível. Vez do Bot.");
+        setInformacao("Acertaste na água! Perdeste -5 de Combustível. Vez do Bot.");
         setCombustivel(c => Math.max(0, c - 5));
-        setCombustivelGasto(combustivelgasto+5);
+        setCombustivelGasto(prev => prev + 5);
     }
 
+    setTirosTabuleiroBotVisible(novosMarcadores);
     setVezDeQuem("bot");
     setTempo(15); 
-    
     setTimeout(() => botAtira(tirosTabuleiroJogador), 1500);
   };
 
   const botAtira = (tirosAtuaisJogador) => {
-    const disponiveis = [];
-    tirosAtuaisJogador.forEach((linha, r) =>
-      linha.forEach((v, c) => { if (v === null) disponiveis.push([r, c]); })
-    );
+    let r, c;
+    const alvosAdjacentes = [];
 
-    if (disponiveis.length === 0) return; 
+    for (let linha = 0; linha < 10; linha++) {
+        for (let coluna = 0; coluna < 10; coluna++) {
+            if (tirosAtuaisJogador[linha][coluna] === "hit") {
+                if (linha > 0 && tirosAtuaisJogador[linha - 1][coluna] === null) alvosAdjacentes.push([linha - 1, coluna]);
+                if (linha < 9 && tirosAtuaisJogador[linha + 1][coluna] === null) alvosAdjacentes.push([linha + 1, coluna]);
+                if (coluna > 0 && tirosAtuaisJogador[linha][coluna - 1] === null) alvosAdjacentes.push([linha, coluna - 1]);
+                if (coluna < 9 && tirosAtuaisJogador[linha][coluna + 1] === null) alvosAdjacentes.push([linha, coluna + 1]);
+            }
+        }
+    }
 
-    const [r, c] = disponiveis[Math.floor(Math.random() * disponiveis.length)];
-    
-    const acertou = tabuleiroJogador[r][c] !== null && tabuleiroJogador[r][c] !== 0; 
+    if (alvosAdjacentes.length > 0) {
+        const alvo = alvosAdjacentes[Math.floor(Math.random() * alvosAdjacentes.length)];
+        r = alvo[0];
+        c = alvo[1];
+    } else {
+        const disponiveis = [];
+        tirosAtuaisJogador.forEach((linhaArr, rowIndex) =>
+          linhaArr.forEach((v, colIndex) => { if (v === null) disponiveis.push([rowIndex, colIndex]); })
+        );
+        
+        if (disponiveis.length === 0) return; 
+        
+        const alvo = disponiveis[Math.floor(Math.random() * disponiveis.length)];
+        r = alvo[0];
+        c = alvo[1];
+    }
+
+    const idBarco = tabuleiroJogador[r][c];
+    const acertou = idBarco !== null && idBarco !== 0; 
 
     const novosTiros = tirosAtuaisJogador.map(l => [...l]);
     novosTiros[r][c] = acertou ? "hit" : "miss";
+    
+    if (acertou) {
+      let afundou = true;
+      for (let linha = 0; linha < 10; linha++) {
+          for (let coluna = 0; coluna < 10; coluna++) {
+              if (tabuleiroJogador[linha][coluna] === idBarco && novosTiros[linha][coluna] !== "hit") {
+                  afundou = false;
+              }
+          }
+      }
+
+      if (afundou) {
+          for (let linha = 0; linha < 10; linha++) {
+              for (let coluna = 0; coluna < 10; coluna++) {
+                  if (tabuleiroJogador[linha][coluna] === idBarco) {
+                      novosTiros[linha][coluna] = "sunk"; 
+                  }
+              }
+          }
+          setInformacao("O Bot afundou um dos teus navios!");
+      } else {
+          setInformacao("O Bot acertou num dos teus navios!");
+      }      
+      setAcertosBot(prev => prev + 1);
+    } else {
+      setInformacao("O Bot atirou na água. É a tua vez!");
+    }
+    
     setTirosTabuleiroJogador(novosTiros);
-
-    setInformacao(acertou ? "O Bot acertou num dos teus navios!" : "O Bot atirou na água. É a tua vez!");
-    setInformacao(acertou ? setAcertosBot(acertosbot+1) : setAcertosBot(acertosbot));
     setVezDeQuem("jogador");
-    setTempo(15); 
+    setTempo(15);
   };
-
-  VerficaFinal();
 
   return (
     <div className="app-container">

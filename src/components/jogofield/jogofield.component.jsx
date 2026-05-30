@@ -41,6 +41,9 @@ function JogoField({ matriz, tiros, isBot, modoDebug, onAtirar }) {
               if (estadoTiro === "hit") {
                 corFundo = "#ef4444"; 
                 cursorRato = "default";
+              } else if (estadoTiro === "sunk") {
+                corFundo = "#1e293b"; 
+                cursorRato = "default";
               } else if (estadoTiro === "miss") {
                 corFundo = "#94a3b8"; 
                 cursorRato = "default";

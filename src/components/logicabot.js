@@ -35,3 +35,40 @@ export function colocarNaviosAleatorio() {
   }
   return tab;
 }
+
+function colocarBarco(mapa, id, size, linha, coluna, orientacao) {
+  for (let i = 0; i < size; i++) {
+    if (orientacao === "H") mapa[linha][coluna + i] = id;
+    else mapa[linha + i][coluna] = id;
+     }
+  }
+
+  export function obterFrotaFixa(tipodefrota) {
+    let mapa = Array(10).fill(null).map(() => Array(10).fill(null));
+
+    if (tipodefrota === "frota1") {
+      colocarBarco(mapa, 1, 5, 0, 0, "H");
+      colocarBarco(mapa, 2, 4, 2, 0, "H");
+      colocarBarco(mapa, 3, 3, 4, 0, "H");
+      colocarBarco(mapa, 4, 3, 6, 0, "H");
+      colocarBarco(mapa, 5, 2, 8, 0, "H");
+      colocarBarco(mapa, 6, 2, 9, 0, "H");
+
+    } else if (tipodefrota === "frota2") {
+      colocarBarco(mapa, 1, 5, 4, 3, "H");
+      colocarBarco(mapa, 2, 4, 0, 5, "V");
+      colocarBarco(mapa, 3, 3, 6, 0, "H");
+      colocarBarco(mapa, 4, 3, 2, 7, "V");
+      colocarBarco(mapa, 5, 2, 8, 2, "H");
+      colocarBarco(mapa, 6, 2, 9, 5, "H");
+
+    } else if (tipodefrota === "frota3") {
+      colocarBarco(mapa, 1, 5, 0, 0, "V");
+      colocarBarco(mapa, 2, 4, 0, 2, "V");
+      colocarBarco(mapa, 3, 3, 0, 4, "V");
+      colocarBarco(mapa, 4, 3, 0, 6, "V");
+      colocarBarco(mapa, 5, 2, 0, 8, "V");
+      colocarBarco(mapa, 6, 2, 2, 9, "H");
+    }
+    return mapa;
+  }
