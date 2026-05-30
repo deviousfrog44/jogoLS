@@ -11,8 +11,14 @@ function App() {
   const [Debug, setDebug] = useState(false);
   const [combustivel, setCombustivel] = useState(100);
   const [tempo, setTempo] = useState(15);
+
   const [acertosjog, setAcertosJog] = useState(0);
   const [acertosbot, setAcertosBot] = useState(0);
+
+  const [combustivelgasto, setCombustivelGasto] = useState(0);
+  const [acertojogtot, setAcertosJogTot] = useState(0);
+  const [acertobottot, setAcertosBotTot] = useState(0);
+
   const [informacao, setInformacao] = useState("Aguardando uma ação do utilizador");
   const [tabuleiroBot, setTabuleiroBot] = useState(null);
   const [tirosTabuleiroBotVisible, setTirosTabuleiroBotVisible] = useState(
@@ -37,31 +43,24 @@ function App() {
     setDebug(false);
     setTirosTabuleiroJogador(Array(10).fill(null).map(() => Array(10).fill(null)));
     setTirosTabuleiroBotVisible(Array(10).fill(null).map(() => Array(10).fill(null)));
+    setAcertosBotTot(0);
+    setAcertosJogTot(0);
+    setCombustivelGasto(0);
   }
 
   const VerficaFinal = () => {
-    if (acertosjog === 19) {
-      setFaseJogo("fimjog");
-      setAcertosBot(0);
-      setAcertosJog(0);
-      setTabuleiroBot(null);
-      setTabuleiroJogador(null);
-    }
-    if (acertosbot === 19) {
-      setFaseJogo("fimbot");
-      setAcertosBot(0);
-      setAcertosJog(0);
-      setTabuleiroBot(null);
-      setTabuleiroJogador(null);
-    }
-    if (combustivel === 80) {
-      setFaseJogo("fimbot");
+    if (acertosjog === 19 || acertosbot === 19 || combustivel === 0) {
+        if (acertosjog===19) {setFaseJogo("fimjog");}
+        if (acertosbot===19||combustivel===0){setFaseJogo("fimbot");}
+      setAcertosBotTot(acertosbot);
+      setAcertosJogTot(acertosjog);
       setCombustivel(100);
       setAcertosBot(0);
       setAcertosJog(0);
       setTabuleiroBot(null);
       setTabuleiroJogador(null);
     }
+
   };
 
   const finalizarSetup = (mapaPronto) => {
@@ -102,6 +101,7 @@ function App() {
     } else {
         setInformacao("Tiro na água! Perdeste -5 Combustível. Vez do Bot.");
         setCombustivel(c => Math.max(0, c - 5));
+        setCombustivelGasto(combustivelgasto+5);
     }
 
     setVezDeQuem("bot");
@@ -196,6 +196,9 @@ function App() {
           {faseJogo === "fimjog" && (
             <div>
               <h1>Fim do Jogo! Ganhaste! Parabens pela vitória, Capitão.</h1>
+              <h4>Acertos Totais: {acertojogtot}</h4>
+              <h4>Acertos Totais (BOT): {acertobottot}</h4>
+              <h4>Gasolina Total Perdida: {combustivelgasto}</h4>
               <button onClick={IniciardoFim} className="btn-iniciar">Jogar Novamente</button>
             </div>
           )}
@@ -203,6 +206,9 @@ function App() {
           {faseJogo === "fimbot" && (
             <div>
               <h1>Fim do Jogo! Perdeste! Boa sorte na proxima tentativa.</h1>
+              <h4>Acertos Totais: {acertojogtot}</h4>
+              <h4>Acertos Totais (BOT): {acertobottot}</h4>
+              <h4>Gasolina Total Perdida: {combustivelgasto}</h4>
               <button onClick={IniciardoFim} className="btn-iniciar">Jogar Novamente</button>
             </div>
           )}
