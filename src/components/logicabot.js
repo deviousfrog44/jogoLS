@@ -58,7 +58,7 @@ function colocarBarco(mapa, id, size, linha, coluna, orientacao) {
       colocarBarco(mapa, 1, 5, 4, 3, "H");
       colocarBarco(mapa, 2, 4, 0, 5, "V");
       colocarBarco(mapa, 3, 3, 6, 0, "H");
-      colocarBarco(mapa, 4, 3, 2, 7, "V");
+      colocarBarco(mapa, 4, 3, 1, 7, "V");
       colocarBarco(mapa, 5, 2, 8, 2, "H");
       colocarBarco(mapa, 6, 2, 9, 5, "H");
 
@@ -68,7 +68,7 @@ function colocarBarco(mapa, id, size, linha, coluna, orientacao) {
       colocarBarco(mapa, 3, 3, 0, 4, "V");
       colocarBarco(mapa, 4, 3, 0, 6, "V");
       colocarBarco(mapa, 5, 2, 0, 8, "V");
-      colocarBarco(mapa, 6, 2, 2, 9, "H");
+      colocarBarco(mapa, 6, 2, 2, 8, "H");
     }
     return mapa;
   }
