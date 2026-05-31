@@ -3,9 +3,10 @@ import React, { useState, useEffect } from "react";
 import { Header, JogoField, Footer, Tabuleiro, Dashboard, PainelJogador} from "./components/";
 import GameOver from "./components/gameover/gameover.component";
 import { colocarNaviosAleatorio, obterFrotaFixa } from "./components/logicabot";
+const criarMatrizVazia = () => Array(10).fill(null).map(() => Array(10).fill(null));
 
 function App() {
-  const [nome_Jogador, setPlayerName] = useState("");
+  const [nomeJogador, setPlayerName] = useState("");
   const [faseJogo, setFaseJogo] = useState("inicio");
   const [tabuleiroJogador, setTabuleiroJogador] = useState(null);
   const [estrategiaBot, setEstrategiaBot] = useState("aleatoria");
@@ -35,7 +36,7 @@ function App() {
     if (nome.trim() !== "") {
       setFaseJogo("jogo");
     } else {
-      alert("Tens de inserir um nome para inciar o jogo!");
+      alert("Tens de inserir um nome para iniciar o jogo!");
     }
   }
   const [radars, setRadars] = useState(0);
@@ -46,8 +47,8 @@ function App() {
     setFaseJogo("inicio");
     setPlayerName("");
     setDebug(false);
-    setTirosTabuleiroJogador(Array(10).fill(null).map(() => Array(10).fill(null)));
-    setTirosTabuleiroBotVisible(Array(10).fill(null).map(() => Array(10).fill(null)));
+    setTirosTabuleiroJogador(criarMatrizVazia());
+    setTirosTabuleiroBotVisible(criarMatrizVazia());
     setAcertosBotTot(0);
     setAcertosJogTot(0);
     setCombustivelGasto(0);
@@ -270,7 +271,7 @@ function App() {
           
           {faseJogo === "inicio" && (
             <PainelJogador 
-               nome={nome_Jogador} 
+               nome={nomeJogador} 
                setNome={setPlayerName} 
                estrategiaBot={estrategiaBot}
                setEstrategiaBot={setEstrategiaBot}
@@ -282,7 +283,7 @@ function App() {
 
           {faseJogo === "jogo" && (
             <div style={{ textAlign: "center" }}>
-              <h3>Capitão {nome_Jogador}</h3>
+              <h3>Capitão {nomeJogador}</h3>
               <Tabuleiro onTerminarSetup={finalizarSetup} />
             </div>
           )}
