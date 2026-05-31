@@ -24,12 +24,8 @@ function App() {
 
   const [informacao, setInformacao] = useState("Aguardando uma ação do utilizador");
   const [tabuleiroBot, setTabuleiroBot] = useState(null);
-  const [tirosTabuleiroBotVisible, setTirosTabuleiroBotVisible] = useState(
-    Array(10).fill(null).map(() => Array(10).fill(null))
-  );
-  const [tirosTabuleiroJogador, setTirosTabuleiroJogador] = useState(
-    Array(10).fill(null).map(() => Array(10).fill(null))
-  );
+  const [tirosTabuleiroBotVisible, setTirosTabuleiroBotVisible] = useState(criarMatrizVazia());
+  const [tirosTabuleiroJogador, setTirosTabuleiroJogador] = useState(criarMatrizVazia()); 
   const [vezDeQuem, setVezDeQuem] = useState("jogador");
 
   const iniciarJogo = (nome) => {
