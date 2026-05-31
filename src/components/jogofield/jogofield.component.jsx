@@ -1,6 +1,7 @@
 import React from "react";
 
-function JogoField({ matriz, tiros, isBot, modoDebug, onAtirar }) {
+
+function JogoField({ matriz, tiros, isBot, modoDebug, onAtirar, areaRadar }) {
   const letras = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
   const numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
@@ -51,9 +52,14 @@ function JogoField({ matriz, tiros, isBot, modoDebug, onAtirar }) {
                 corFundo = "#475569"; 
               }
 
+              const isNaAreaRadar = areaRadar && isBot &&
+                indexLinha >= areaRadar.linha && indexLinha <= areaRadar.linha + 1 &&
+                indexColuna >= areaRadar.coluna && indexColuna <= areaRadar.coluna + 1;
+
               return (
                 <div 
                   key={`${indexLinha}-${indexColuna}`}
+                  className={isNaAreaRadar ? 'radar-destaque' : ''}
                   onClick={() => {
                     if (isBot && onAtirar && estadoTiro === null) {
                       onAtirar(indexLinha, indexColuna);

@@ -1,6 +1,7 @@
 import "./assets/styles/App.css";
 import React, { useState, useEffect } from "react";
-import { Header, JogoField, Footer, Tabuleiro, Dashboard, PainelJogador } from "./components/";
+import { Header, JogoField, Footer, Tabuleiro, Dashboard, PainelJogador} from "./components/";
+import GameOver from "./components/gameover/gameover.component";
 import { colocarNaviosAleatorio, obterFrotaFixa } from "./components/logicabot";
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
 
   const [acertosjog, setAcertosJog] = useState(0);
   const [acertosbot, setAcertosBot] = useState(0);
+  const [jogadasTotais, setJogadasTotais] = useState(0);
 
   const [combustivelgasto, setCombustivelGasto] = useState(0);
   const [acertojogtot, setAcertosJogTot] = useState(0);
@@ -35,7 +37,10 @@ function App() {
     } else {
       alert("Tens de inserir um nome para inciar o jogo!");
     }
-  };
+  }
+  const [radars, setRadars] = useState(0);
+  const [areaRadar, setAreaRadar] = useState(null);
+  
 
   const IniciardoFim = () => {
     setFaseJogo("inicio");
@@ -48,6 +53,11 @@ function App() {
     setCombustivelGasto(0);
     setCombustivel(100);
     setTempo(15);
+    setRadars(0);
+    setAreaRadar(null);
+    setAcertosBot(0);
+    setAcertosJog(0);
+    setJogadasTotais(0);
   };
 
   useEffect(() => {
@@ -97,12 +107,17 @@ function App() {
   const handleTiroJogador = (linha, coluna) => {
     if (vezDeQuem !== "jogador") return;
     if (tirosTabuleiroBotVisible[linha][coluna] !== null) return;
+    
+    setJogadasTotais(prev => prev + 1);
+
+    setAreaRadar(null);
+
     const idBarco = tabuleiroBot[linha][coluna];
     const acertou = idBarco !== null && idBarco !== 0;
-    
     const novosMarcadores = tirosTabuleiroBotVisible.map(l => [...l]);
     novosMarcadores[linha][coluna] = acertou ? "hit" : "miss";
-    
+    setCombustivelGasto(prev => prev + 5);
+
     if (acertou) {
         let afundou = true;
         for (let r = 0; r < 10; r++) {
@@ -111,6 +126,11 @@ function App() {
                     afundou = false; 
                 }
             }
+        }
+        let mensagemRadar = "";
+        if (tempo > 12) { 
+            setRadars(prev => prev + 1); 
+            mensagemRadar = " Ganhaste um uso do Radar!";
         }
 
         if (afundou) {
@@ -121,16 +141,20 @@ function App() {
                     }
                 }
             }
-            setInformacao("Afundaste um navio inimigo! Ganhaste +5 de Combustível.");
+            setInformacao("Afundaste um navio inimigo! Ganhaste 10 de Combustível." + mensagemRadar);
         } else {
-            setInformacao("Acertaste num navio! Ganhaste +5 de Combustível.");
+            setInformacao("Acertaste num navio! Ganhaste 10 de Combustível." + mensagemRadar);
         }
-        setCombustivel(c => Math.min(100, c + 5)); 
+        
+        setCombustivel(c => {
+            let aposDisparo = Math.max(0, c - 5); 
+            return Math.min(100, aposDisparo + 10); 
+        }); 
+        
         setAcertosJog(prev => prev + 1);
     } else {
-        setInformacao("Acertaste na água! Perdeste -5 de Combustível. Vez do Bot.");
+        setInformacao("Acertaste na água! Perdeste 5 de Combustível. Vez do Bot.");
         setCombustivel(c => Math.max(0, c - 5));
-        setCombustivelGasto(prev => prev + 5);
     }
 
     setTirosTabuleiroBotVisible(novosMarcadores);
@@ -209,6 +233,34 @@ function App() {
     setTempo(15);
   };
 
+  const ativarRadar = () => {
+    if (radars <= 0) return;
+
+    const partesIntactas = [];
+    
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        const temNavio = tabuleiroBot[r][c] !== null && tabuleiroBot[r][c] !== 0;
+        const naoAtingido = tirosTabuleiroBotVisible[r][c] === null;
+        
+        if (temNavio && naoAtingido) {
+          partesIntactas.push({ r, c });
+        }
+      }
+    }
+
+    if (partesIntactas.length === 0) return;
+
+    const alvo = partesIntactas[Math.floor(Math.random() * partesIntactas.length)];
+
+    const startR = alvo.r === 9 ? 8 : alvo.r;
+    const startC = alvo.c === 9 ? 8 : alvo.c;
+
+    setAreaRadar({ linha: startR, coluna: startC });
+    setRadars(prev => prev - 1);
+    setInformacao("Radar ativado! Uma área 2x2 foi destacada no tabuleiro inimigo.");
+  };
+
   return (
     <div className="app-container">
       <div className="game-card">
@@ -242,50 +294,74 @@ function App() {
               tempo={`00:${tempo < 10 ? `0${tempo}` : tempo}`} 
               informacao={informacao} />
 
-              <div className="batalha-container">
-                <div>
-                  <h4 style={{ margin: "0 0 10px 0", color: "#475569" }}>A Tua Frota</h4>
+              <div style={{ textAlign: "center", marginBottom: "15px" }}>
+                <button 
+                  onClick={ativarRadar} 
+                  disabled={radars <= 0 || vezDeQuem !== "jogador"}
+                  style={{ 
+                    padding: "10px", 
+                    backgroundColor: radars > 0 && vezDeQuem === "jogador" ? "#10b981" : "#ccc", 
+                    color: "white", 
+                    borderRadius: "5px", 
+                    border: "none", 
+                    cursor: radars > 0 && vezDeQuem === "jogador" ? "pointer" : "not-allowed",
+                    fontWeight: "bold"
+                  }}
+                >
+                   Usar o Radar Inteligente. ({radars} disponíveis)
+                </button>
+              </div>
+
+            <div className="batalha-container">
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <h4 style={{ margin: "0 0 5px 0", color: "#475569" }}>A Tua Frota</h4>
+                    <div style={{ minHeight: "28px", marginBottom: "5px" }}>
+                    {vezDeQuem === "bot" && (
+                      <span style={{ backgroundColor: "#ef4444", color: "white", padding: "4px 10px", borderRadius: "5px", fontSize: "0.85rem", fontWeight: "bold" }}>
+                        O BOT ESTÁ A JOGAR!!
+                      </span>
+                    )}
+                  </div>
+                  
                   <JogoField 
                     matriz={tabuleiroJogador} 
                     tiros={tirosTabuleiroJogador} 
                     isBot={false} 
                   />
-                  
                 </div>
-                <div>
-                  <h4 style={{ margin: "0 0 10px 0", color: "#ef4444" }}>Frota do Bot</h4>
+                
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <h4 style={{ margin: "0 0 5px 0", color: "#ef4444" }}>Frota do Bot</h4>
+    
+                  <div style={{ minHeight: "28px", marginBottom: "5px" }}>
+                    {vezDeQuem === "jogador" && (
+                      <span style={{ backgroundColor: "#10b981", color: "white", padding: "4px 10px", borderRadius: "5px", fontSize: "0.85rem", fontWeight: "bold" }}>
+                        É A TUA VEZ DE ATACAR!!
+                      </span>
+                    )}
+                  </div>
                   
                   <JogoField 
                     matriz={tabuleiroBot} 
                     tiros={tirosTabuleiroBotVisible}
                     isBot={true}
                     modoDebug={Debug} 
-                    onAtirar={handleTiroJogador} 
+                    onAtirar={handleTiroJogador}
+                    areaRadar={areaRadar}
                   />
-                  
                 </div>
               </div>
             </div>
           )}
-
-          {faseJogo === "fimjog" && (
-            <div>
-              <h1>Fim do Jogo! Ganhaste! Parabens pela vitória, Capitão.</h1>
-              <h4>Acertos Totais: {acertojogtot}</h4>
-              <h4>Acertos Totais (BOT): {acertobottot}</h4>
-              <h4>Gasolina Total Perdida: {combustivelgasto}</h4>
-              <button onClick={IniciardoFim} className="btn-iniciar">Jogar Novamente</button>
-            </div>
-          )}
-
-          {faseJogo === "fimbot" && (
-            <div>
-              <h1>Fim do Jogo! Perdeste! Boa sorte na proxima tentativa.</h1>
-              <h4>Acertos Totais: {acertojogtot}</h4>
-              <h4>Acertos Totais (BOT): {acertobottot}</h4>
-              <h4>Gasolina Total Perdida: {combustivelgasto}</h4>
-              <button onClick={IniciardoFim} className="btn-iniciar">Jogar Novamente</button>
-            </div>
+          {(faseJogo === "fimjog" || faseJogo === "fimbot") && (
+            <GameOver 
+              faseJogo={faseJogo}
+              jogadasTotais={jogadasTotais}
+              acertosJogTot={acertojogtot}
+              acertosBotTot={acertobottot}
+              combustivelGasto={combustivelgasto}
+              onReiniciar={IniciardoFim}
+            />
           )}
 
         </main>
